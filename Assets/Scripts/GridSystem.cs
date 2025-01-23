@@ -37,7 +37,7 @@ public class GridSystem : MonoBehaviour
         {
             
 
-            for (int j = 0; j <= gridYSize; j++)
+            for (int j = 0; j <= gridZSize; j++)
             {  
                 Vector3 newTilePos = new Vector3(xPos, 0, zPos);
                 GameObject newTileGO = Instantiate(gridTileVisual, newTilePos, Quaternion.identity);

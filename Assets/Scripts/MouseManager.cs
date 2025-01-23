@@ -47,7 +47,7 @@ public class MouseManager : MonoBehaviour
                 break;
             case HouseBuilding.MouseUp:
                 testGO = finalGO;
-                PlaceBuilding();
+                //PlaceBuilding();
                 break;
             case HouseBuilding.None:
                 break;
@@ -189,15 +189,8 @@ public class MouseManager : MonoBehaviour
                 //Debug.Log(raycastHit.transform.gameObject.name);
                 GridPosition hitGridPosition = raycastHit.transform.GetComponent<GridPosition>();
                 GridPosition.TilePos tilePose = hitGridPosition.GetTilePos();
-
-                if(endTile.X != startTile.X && endTile.Y != startTile.Y)
-                {
-                    endTile = tilePose;
-                }
-                else
-                {
-                    return;
-                }
+                endTile = tilePose;
+                
                 
                 //Debug.Log(tilePose.X + "," + tilePose.Y);
                 if (endTile.X == startTile.X || endTile.Y == startTile.Y)
@@ -206,7 +199,7 @@ public class MouseManager : MonoBehaviour
                 }
 
                 //Testing
-                GetSelectedTiles(startTile, endTile);
+                
                 CreateWalls(GetSelectedTiles(startTile, endTile));
                 //Vector3 newGOSpawn = new Vector3(raycastHit.transform.position.x, raycastHit.transform.position.y + 1.5f, raycastHit.transform.position.z);
                 //Instantiate(testGO, newGOSpawn, Quaternion.identity);
@@ -299,25 +292,27 @@ public class MouseManager : MonoBehaviour
         if (/*startTile.X < endTile.X && startTile.Y < endTile.Y*/ 1 == 1)
         {
 
-            
 
-            /*if (startTile.X < endTile.X && startTile.Y < endTile.Y)
+
+            if (startTile.X < endTile.X && startTile.Y < endTile.Y)
             {
                 startx = Convert.ToInt32(startTile.X);
                 starty = Convert.ToInt32(startTile.Y);
             }
-            else
+            if(startTile.X > endTile.X && startTile.Y > endTile.Y)
             {
                 startx = Convert.ToInt32(endTile.X);
                 starty = Convert.ToInt32(endTile.Y);
-            }*/
-
-            if (startTile.Y < endTile.Y && startTile.X > endTile.X)
-            {
-                startx = Convert.ToInt32(startTile.Y);
-                starty = Convert.ToInt32(endTile.X);
             }
-            else
+
+            if (startTile.X < endTile.X &&  startTile.Y > endTile.Y )
+            {
+                startx = Convert.ToInt32(startTile.X);
+                starty = Convert.ToInt32(endTile.Y);
+
+                
+            }
+            if(startTile.X > endTile.X && startTile.Y < endTile.Y )
             {
                 startx = Convert.ToInt32(startTile.X);
                 starty = Convert.ToInt32(endTile.Y);
@@ -326,6 +321,10 @@ public class MouseManager : MonoBehaviour
             int xpos = startx;
             int ypos = starty;
 
+            if(selectedTiles.GetLength(0) !> 2 && selectedTiles.GetLength(0)! > 2)
+            {
+                return null;
+            }
 
 
             for (int i = 0; i <= arrayLengthX; i++)
@@ -372,10 +371,18 @@ public class MouseManager : MonoBehaviour
     private void CreateWalls(GridPosition.TilePos[,] selectedTiles)
     {
         
+        if(selectedTiles == null)
+        {
+            return;
+        }
 
         int arrayLengthX = selectedTiles.GetLength(0) - 1;
         int arrayLengthZ = selectedTiles.GetLength(1) - 1;
 
+        if(arrayLengthX !> 1 ||  arrayLengthZ !> 1)
+        {
+            return;
+        }
         
 
         for (int i = 0; i <= arrayLengthX; i++)
