@@ -81,11 +81,10 @@ public class MouseManager : MonoBehaviour
             if (raycastHit.transform != null)
             {
                 //Our custom method. 
-                Debug.Log(raycastHit.transform.gameObject.name);
                 GridPosition hitGridPosition = raycastHit.transform.GetComponent<GridPosition>();
                 GridPosition.TilePos tilePose = hitGridPosition.GetTilePos();
                 startTile = tilePose;
-                //Debug.Log(tilePose.X + "," + tilePose.Y);
+                Debug.Log(tilePose.X + "," + tilePose.Y);
 
                 //Testing
 
@@ -287,79 +286,80 @@ public class MouseManager : MonoBehaviour
         int startx = Convert.ToInt32(startTile.X);
         int starty = Convert.ToInt32(startTile.Y);
         
-        //Debug.Log(startx + "," + starty);
+        Debug.Log(startx + "," + starty);
 
-        if (/*startTile.X < endTile.X && startTile.Y < endTile.Y*/ 1 == 1)
+      
+
+
+
+        if (startTile.X < endTile.X && startTile.Y < endTile.Y)
         {
-
-
-
-            if (startTile.X < endTile.X && startTile.Y < endTile.Y)
-            {
-                startx = Convert.ToInt32(startTile.X);
-                starty = Convert.ToInt32(startTile.Y);
-            }
-            if(startTile.X > endTile.X && startTile.Y > endTile.Y)
-            {
-                startx = Convert.ToInt32(endTile.X);
-                starty = Convert.ToInt32(endTile.Y);
-            }
-
-            if (startTile.X < endTile.X &&  startTile.Y > endTile.Y )
-            {
-                startx = Convert.ToInt32(startTile.X);
-                starty = Convert.ToInt32(endTile.Y);
-
-                
-            }
-            if(startTile.X > endTile.X && startTile.Y < endTile.Y )
-            {
-                startx = Convert.ToInt32(startTile.X);
-                starty = Convert.ToInt32(endTile.Y);
-            }
-
-            int xpos = startx;
-            int ypos = starty;
-
-            if(selectedTiles.GetLength(0) !> 2 && selectedTiles.GetLength(0)! > 2)
-            {
-                return null;
-            }
-
-
-            for (int i = 0; i <= arrayLengthX; i++)
-            {
-                
-                //Debug.Log(gridSystem.GetTileInArray(xpos, ypos).X + ","  + gridSystem.GetTileInArray(xpos, ypos).Y);
-                //Debug.Log(gridSystem.GetTileInArray(xpos, ypos).X);
-                selectedTiles[0, i] = gridSystem.GetTileInArray(xpos, ypos);
-                selectedTiles[arrayLengthX, i] = gridSystem.GetTileInArray(xpos + arrayLengthX, ypos);
-                ypos++;
-
-            }
-            ypos = starty;
-            for (int j = 1; j <= arrayLengthZ; j++)
-            {
-                selectedTiles[j, 0] = gridSystem.GetTileInArray(xpos + 1, ypos);
-                selectedTiles[j, arrayLengthX] = gridSystem.GetTileInArray(xpos + 1, ypos + arrayLengthX);
-                xpos++;
-
-            }
-
-
-            for (int i = 0; i <= arrayLengthX; i++)
-            {
-                for (int j = 0; j <= arrayLengthZ; j++)
-                {
-                    Debug.Log(selectedTiles[i, j].X + "." + selectedTiles[i, j].Y);
-
-                }
-            }
-
-
-
-            return selectedTiles;
+            startx = Convert.ToInt32(startTile.X);
+            starty = Convert.ToInt32(startTile.Y);
         }
+        if(startTile.X > endTile.X && startTile.Y > endTile.Y)
+        {
+            startx = Convert.ToInt32(endTile.X);
+            starty = Convert.ToInt32(endTile.Y);
+        }
+
+        if (startTile.X < endTile.X &&  startTile.Y > endTile.Y )
+        {
+            startx = Convert.ToInt32(startTile.X);
+            starty = Convert.ToInt32(endTile.Y);
+
+                
+        }
+        if(startTile.X > endTile.X && startTile.Y < endTile.Y )
+        {
+            startx = Convert.ToInt32(endTile.X);
+            starty = Convert.ToInt32(startTile.Y);
+        }
+
+        int xpos = startx;
+        int ypos = starty;
+        
+        Debug.Log(xpos + "," + ypos);
+
+        if(selectedTiles.GetLength(0) !> 2 && selectedTiles.GetLength(0)! > 2)
+        {
+            return null;
+        }
+
+
+        for (int i = 0; i <= arrayLengthX; i++)
+        {
+                
+            //Debug.Log(gridSystem.GetTileInArray(xpos, ypos).X + ","  + gridSystem.GetTileInArray(xpos, ypos).Y);
+            //Debug.Log(gridSystem.GetTileInArray(xpos, ypos).X);
+            selectedTiles[0, i] = gridSystem.GetTileInArray(xpos, ypos);
+            selectedTiles[arrayLengthX, i] = gridSystem.GetTileInArray(xpos + arrayLengthX, ypos);
+            ypos++;
+
+        }
+        ypos = starty;
+        for (int j = 1; j <= arrayLengthZ; j++)
+        {
+            selectedTiles[j, 0] = gridSystem.GetTileInArray(xpos + 1, ypos);
+            selectedTiles[j, arrayLengthX] = gridSystem.GetTileInArray(xpos + 1, ypos + arrayLengthX);
+            xpos++;
+
+        }
+
+
+        for (int i = 0; i <= arrayLengthX; i++)
+        {
+            for (int j = 0; j <= arrayLengthZ; j++)
+            {
+                //Debug.Log(selectedTiles[i, j].X + "." + selectedTiles[i, j].Y);
+
+            }
+        }
+
+
+
+        return selectedTiles;
+        
         
 
         
