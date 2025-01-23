@@ -788,8 +788,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f10fcf82ce1152d428190040d2c9c9fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  preVizGO: {fileID: 3756415556380609043, guid: e009897885af9cf4f8d761a8bd36f782, type: 3}
+  finalGO: {fileID: 3756415556380609043, guid: f4f1961d065e91642a8346452bb3b258, type: 3}
   testGO: {fileID: 3756415556380609043, guid: f4f1961d065e91642a8346452bb3b258, type: 3}
   gridSystem: {fileID: 0}
+  houseBuildingState: 0
 --- !u!1 &2013410473
 GameObject:
   m_ObjectHideFlags: 1
