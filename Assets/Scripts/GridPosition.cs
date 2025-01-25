@@ -7,16 +7,10 @@ public class GridPosition : MonoBehaviour
     TilePos tilePos;
 
     public struct TilePos
-
     {
-
         public float X;
 
         public float Y;
-
-        
-
-
 
         public TilePos(float x, float y)
 

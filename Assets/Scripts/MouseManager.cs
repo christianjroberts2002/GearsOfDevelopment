@@ -65,7 +65,7 @@ public class MouseManager : MonoBehaviour
             houseBuildingState = HouseBuilding.MouseDown;
             
         }
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) && houseBuildingState == HouseBuilding.MouseDragged)
         {
             houseBuildingState = HouseBuilding.MouseUp;
         }
@@ -286,10 +286,14 @@ public class MouseManager : MonoBehaviour
 
     private GridPosition.TilePos[,] GetSelectedTiles(GridPosition.TilePos startTile, GridPosition.TilePos endTile)
     {
-        GridPosition.TilePos[,] selectedTiles = new GridPosition.TilePos[Convert.ToInt32(MathF.Abs(startTile.X - endTile.X) + 1),Convert.ToInt32(MathF.Abs(startTile.Y - endTile.Y) + 1)];
+        int arrayLengthX = Convert.ToInt32(MathF.Abs(startTile.X - endTile.X) + 1);
+        int arrayLengthZ = Convert.ToInt32(MathF.Abs(startTile.Y - endTile.Y) + 1);
 
-        int arrayLengthX = selectedTiles.GetLength(0) - 1;
-        int arrayLengthZ = selectedTiles.GetLength(1) - 1;
+
+        GridPosition.TilePos[,] selectedTiles = new GridPosition.TilePos[arrayLengthX,arrayLengthZ];
+
+        
+         
 
         
 
@@ -303,9 +307,25 @@ public class MouseManager : MonoBehaviour
 
 
 
+        if (startTile.X < endTile.X)
+        {
+            startx = Convert.ToInt32(startTile.X);
+        }
+        else
+        {
+            startx = Convert.ToInt32(endTile.X);
+        }
 
+        if (startTile.Y < endTile.Y)
+        {
+            starty = Convert.ToInt32(startTile.X);
+        }
+        else
+        {
+            starty = Convert.ToInt32(endTile.X);
+        }
 
-        if (startTile.X < endTile.X && startTile.Y < endTile.Y)
+        /*if (startTile.X < endTile.X && startTile.Y < endTile.Y)
         {
             startx = Convert.ToInt32(startTile.X);
             starty = Convert.ToInt32(startTile.Y);
@@ -327,7 +347,7 @@ public class MouseManager : MonoBehaviour
         {
             startx = Convert.ToInt32(endTile.X);
             starty = Convert.ToInt32(startTile.Y);
-        }
+        }*/
 
         int xpos = startx;
         int ypos = starty;
@@ -337,27 +357,30 @@ public class MouseManager : MonoBehaviour
 
         if (Mathf.Abs(startTile.X - endTile.X) <= 1 || Mathf.Abs(startTile.Y - endTile.Y) <= 1)
         {
-            return null;
+            Debug.Log("this is smaller than a 3X3s");
         }
 
 
-        for (int j = 0; j <= arrayLengthZ; j++)
+        for (int i = 0; i < arrayLengthZ; i++)
         {
-            selectedTiles[0,j] = gridSystem.GetTileInArray(xpos, ypos);
-            selectedTiles[j, arrayLengthX] = gridSystem.GetTileInArray(xpos + arrayLengthX, ypos);
+            Debug.Log(gridSystem.GetTileInArray(xpos, ypos));
+            selectedTiles[i,0] = gridSystem.GetTileInArray(xpos, ypos);
+            selectedTiles[i, arrayLengthX - 1] = gridSystem.GetTileInArray(xpos + arrayLengthX - 1, ypos);
             ypos++;
 
         }
         ypos = starty;
-        for (int i = 1; i <= arrayLengthZ - 1; i++)
+        xpos++;
+        for (int i = 1; i < arrayLengthX - 1; i++)
         {
-            xpos++;
-            Debug.Log(gridSystem.GetTileInArray(xpos, ypos).X + ","  + gridSystem.GetTileInArray(xpos, ypos).Y);
+            
+            //Debug.Log(gridSystem.GetTileInArray(xpos, ypos).X + ","  + gridSystem.GetTileInArray(xpos, ypos).Y);
             //Debug.Log(gridSystem.GetTileInArray(xpos, ypos).X);
             Debug.Log(i);
-            selectedTiles[i,0] = gridSystem.GetTileInArray(xpos, ypos);
-            selectedTiles[arrayLengthZ, i] = gridSystem.GetTileInArray(xpos + arrayLengthX, ypos);
-            
+            selectedTiles[0,i] = gridSystem.GetTileInArray(xpos, ypos);
+            selectedTiles[arrayLengthZ - 1, i] = gridSystem.GetTileInArray(xpos, ypos + arrayLengthZ - 1);
+            xpos++;
+
 
         }
         xpos = starty;
@@ -393,18 +416,18 @@ public class MouseManager : MonoBehaviour
             return;
         }
 
-        int arrayLengthX = selectedTiles.GetLength(0) - 1;
-        int arrayLengthZ = selectedTiles.GetLength(1) - 1;
+        int arrayLengthX = selectedTiles.GetLength(0);
+        int arrayLengthZ = selectedTiles.GetLength(1);
 
-        if(arrayLengthX !> 2 ||  arrayLengthZ !> 2)
+        /*if(arrayLengthX !> 2 ||  arrayLengthZ !> 2)
         {
             return;
-        }
+        }*/
         
 
-        for (int i = 0; i <= arrayLengthX; i++)
+        for (int i = 0; i < arrayLengthX; i++)
         {
-            for (int j = 0; j <= arrayLengthZ; j++)
+            for (int j = 0; j < arrayLengthZ; j++)
             {
                 Vector3 newGOSpawn = new Vector3(selectedTiles[i,j].Y * 1.5f, 1.5f, selectedTiles[i,j].X * 1.5f);
                 GameObject newBlock = Instantiate(testGO, newGOSpawn, Quaternion.identity);
