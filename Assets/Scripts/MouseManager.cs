@@ -26,7 +26,9 @@ public class MouseManager : MonoBehaviour
     GridPosition.TilePos endTile;
 
     public HouseBuilding houseBuildingState;
-    
+
+    private bool preVizWallDown = false;
+
 
 
 
@@ -68,6 +70,9 @@ public class MouseManager : MonoBehaviour
         if (Input.GetMouseButtonUp(0) && houseBuildingState == HouseBuilding.MouseDragged)
         {
             houseBuildingState = HouseBuilding.MouseUp;
+            preVizWallDown = false;
+            
+            DestroyPreVizBlocks(preVizWall);
         }
 
         if (houseBuildingState == HouseBuilding.MouseDown)
@@ -283,8 +288,46 @@ public class MouseManager : MonoBehaviour
         // place GO in the edge tiles
     }
 
-
     private GridPosition.TilePos[,] GetSelectedTiles(GridPosition.TilePos startTile, GridPosition.TilePos endTile)
+    {
+        int startx = Convert.ToInt32(Mathf.Min(startTile.X, endTile.X));
+        int endx = Convert.ToInt32(Mathf.Max(startTile.X, endTile.X));
+        int starty = Convert.ToInt32(Mathf.Min(startTile.Y, endTile.Y));
+        int endy = Convert.ToInt32(Mathf.Max(startTile.Y, endTile.Y));
+
+        int arrayLengthX = endx - startx + 1;
+        int arrayLengthZ = endy - starty + 1;
+
+        int xpos = startx;
+        int ypos = starty;
+;
+
+        // First, we need to clear out the array before filling it
+        GridPosition.TilePos[,] selectedTiles = new GridPosition.TilePos[arrayLengthX, arrayLengthZ];
+
+        // Top and Bottom Edges (Y stays constant)
+        for (int i = 0; i < arrayLengthX; i++)
+        {
+            // Top edge: (i, 0)
+            selectedTiles[i, 0] = gridSystem.GetTileInArray(startx + i, starty);  // starty is constant for top
+                                                                                  // Bottom edge: (i, arrayLengthZ - 1)
+            selectedTiles[i, arrayLengthZ - 1] = gridSystem.GetTileInArray(startx + i, starty + arrayLengthZ - 1); // starty + arrayLengthZ - 1 for the bottom
+        }
+
+        // Left and Right Edges (X stays constant)
+        for (int i = 1; i < arrayLengthZ - 1; i++) // Avoid duplicate corners
+        {
+            // Left edge: (0, i)
+            selectedTiles[0, i] = gridSystem.GetTileInArray(startx, starty + i);  // startx is constant for left
+                                                                                  // Right edge: (arrayLengthX - 1, i)
+            selectedTiles[arrayLengthX - 1, i] = gridSystem.GetTileInArray(startx + arrayLengthX - 1, starty + i);  // startx + arrayLengthX - 1 for the right
+        }
+
+        return selectedTiles;
+    }
+
+
+/*    private GridPosition.TilePos[,] GetSelectedTiles(GridPosition.TilePos startTile, GridPosition.TilePos endTile)
     {
         int arrayLengthX = Convert.ToInt32(MathF.Abs(startTile.X - endTile.X) + 1);
         int arrayLengthZ = Convert.ToInt32(MathF.Abs(startTile.Y - endTile.Y) + 1);
@@ -307,7 +350,7 @@ public class MouseManager : MonoBehaviour
 
 
 
-        if (startTile.X < endTile.X)
+        *//*if (startTile.X < endTile.X)
         {
             startx = Convert.ToInt32(startTile.X);
         }
@@ -323,7 +366,7 @@ public class MouseManager : MonoBehaviour
         else
         {
             starty = Convert.ToInt32(endTile.X);
-        }
+        }*/
 
         /*if (startTile.X < endTile.X && startTile.Y < endTile.Y)
         {
@@ -347,7 +390,7 @@ public class MouseManager : MonoBehaviour
         {
             startx = Convert.ToInt32(endTile.X);
             starty = Convert.ToInt32(startTile.Y);
-        }*/
+        }*//*
 
         int xpos = startx;
         int ypos = starty;
@@ -405,11 +448,14 @@ public class MouseManager : MonoBehaviour
 
 
 
-    }
+    }*/
 
     private void CreateWalls(GridPosition.TilePos[,] selectedTiles)
     {
+        
+
         preVizWall = new List<GameObject>();
+        
 
         if(selectedTiles == null)
         {
@@ -425,14 +471,20 @@ public class MouseManager : MonoBehaviour
         }*/
         
 
+
+        if(preVizWallDown)
+        {
+            return;
+        }
         for (int i = 0; i < arrayLengthX; i++)
         {
             for (int j = 0; j < arrayLengthZ; j++)
             {
                 Vector3 newGOSpawn = new Vector3(selectedTiles[i,j].Y * 1.5f, 1.5f, selectedTiles[i,j].X * 1.5f);
                 GameObject newBlock = Instantiate(testGO, newGOSpawn, Quaternion.identity);
+                Debug.Log(newBlock.transform.name);
                 preVizWall.Add(newBlock);
-
+                preVizWallDown = true;
 
             }
         }
@@ -459,7 +511,11 @@ public class MouseManager : MonoBehaviour
     private void DestroyPreVizBlocks(List<GameObject> goList)
     {
         foreach (GameObject go in goList)
+        {
+            Debug.Log(go);
             Destroy(go);
+        }
+            
     }
     
 }
