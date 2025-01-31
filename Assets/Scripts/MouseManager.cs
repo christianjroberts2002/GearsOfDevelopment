@@ -28,15 +28,13 @@ public class MouseManager : MonoBehaviour
     public HouseBuilding houseBuildingState;
 
     private bool preVizWallDown = false;
-
+    private bool startIsZero = false;
 
 
 
     private void Start()
     {
         gridSystem = GetComponent<GridSystem>();
-        // Lock the mouse Pos
-        // Cursor.lockState = CursorLockMode.Locked;
         houseBuildingState = HouseBuilding.None;
 
         
@@ -54,9 +52,6 @@ public class MouseManager : MonoBehaviour
                 break;
             case HouseBuilding.MouseUp:
                 testGO = finalGO;
-                //if(preVizWall.Count > 0)
-                    //DestroyPreVizBlocks(preVizWall);
-                //PlaceBuilding();
                 break;
             case HouseBuilding.None:
                 break;
@@ -93,16 +88,12 @@ public class MouseManager : MonoBehaviour
         {
             if (raycastHit.transform != null)
             {
-                //Our custom method. 
                 GridPosition hitGridPosition = raycastHit.transform.GetComponent<GridPosition>();
                 GridPosition.TilePos tilePose = hitGridPosition.GetTilePos();
                 startTile = tilePose;
                 Debug.Log(tilePose.X + "," + tilePose.Y);
+                
 
-                //Testing
-
-                //Vector3 newGOSpawn = new Vector3(raycastHit.transform.position.x, raycastHit.transform.position.y + 1.5f, raycastHit.transform.position.z);
-                //Instantiate(testGO, newGOSpawn, Quaternion.identity);
                 houseBuildingState = HouseBuilding.MouseDragged;
             }
         }
@@ -116,12 +107,9 @@ public class MouseManager : MonoBehaviour
         {
             if (raycastHit.transform != null)
             {
-                //Our custom method. 
-                //Debug.Log(raycastHit.transform.gameObject.name);
                 GridPosition hitGridPosition = raycastHit.transform.GetComponent<GridPosition>();
                 GridPosition.TilePos tilePose = hitGridPosition.GetTilePos();
                 endTile = tilePose;
-                //Debug.Log(tilePose.X + "," + tilePose.Y);
                 if (endTile.X == startTile.X || endTile.Y == startTile.Y)
                 {
                     return;
@@ -130,8 +118,7 @@ public class MouseManager : MonoBehaviour
                 //Testing
                 GetSelectedTiles(startTile, endTile);
                 CreateWalls(GetSelectedTiles(startTile, endTile));
-                //Vector3 newGOSpawn = new Vector3(raycastHit.transform.position.x, raycastHit.transform.position.y + 1.5f, raycastHit.transform.position.z);
-                //Instantiate(testGO, newGOSpawn, Quaternion.identity);
+
             }
         }
 
@@ -139,58 +126,7 @@ public class MouseManager : MonoBehaviour
     }
 
     private void PreVizBuilding()
-    {/*
-        if (Input.GetMouseButtonDown(0))
-        {
-            RaycastHit raycastHit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out raycastHit, 100f))
-            {
-                if (raycastHit.transform != null)
-                {
-                    //Our custom method. 
-                    //Debug.Log(raycastHit.transform.gameObject.name);
-                    GridPosition hitGridPosition = raycastHit.transform.GetComponent<GridPosition>();
-                    GridPosition.TilePos tilePose = hitGridPosition.GetTilePos();
-                    startTile = tilePose;
-                    //Debug.Log(tilePose.X + "," + tilePose.Y);
-
-                    //Testing
-
-                    //Vector3 newGOSpawn = new Vector3(raycastHit.transform.position.x, raycastHit.transform.position.y + 1.5f, raycastHit.transform.position.z);
-                    //Instantiate(testGO, newGOSpawn, Quaternion.identity);
-                }
-            }
-        }*/
-
-        /*if (Input.GetMouseButtonUp(0))
-        {
-            RaycastHit raycastHit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out raycastHit, 100f))
-            {
-                if (raycastHit.transform != null)
-                {
-                    //Our custom method. 
-                    //Debug.Log(raycastHit.transform.gameObject.name);
-                    GridPosition hitGridPosition = raycastHit.transform.GetComponent<GridPosition>();
-                    GridPosition.TilePos tilePose = hitGridPosition.GetTilePos();
-                    endTile = tilePose;
-                    //Debug.Log(tilePose.X + "," + tilePose.Y);
-                    if (endTile.X == startTile.X || endTile.Y == startTile.Y)
-                    {
-                        return;
-                    }
-
-                    //Testing
-                    GetSelectedTiles(startTile, endTile);
-                    CreateWalls(GetSelectedTiles(startTile, endTile));
-                    //Vector3 newGOSpawn = new Vector3(raycastHit.transform.position.x, raycastHit.transform.position.y + 1.5f, raycastHit.transform.position.z);
-                    //Instantiate(testGO, newGOSpawn, Quaternion.identity);
-                }
-            }
-        }*/
-
+    {
         RaycastHit raycastHit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out raycastHit, 1000f, layerMask))
@@ -201,7 +137,18 @@ public class MouseManager : MonoBehaviour
                 //Debug.Log(raycastHit.transform.gameObject.name);
                 GridPosition hitGridPosition = raycastHit.transform.GetComponent<GridPosition>();
                 GridPosition.TilePos tilePose = hitGridPosition.GetTilePos();
-                
+
+                if ((startTile.X == 0 && startTile.Y == 0) || (endTile.X == 0 && endTile.Y == 0))
+                {
+                    startIsZero = true;
+                }
+
+                if (endTile.X != null && endTile.X != tilePose.X && endTile.Y != null && endTile.Y != tilePose.X)
+                {
+                    DestroyPreVizBlocks(preVizWall);
+                    preVizWallDown = false;
+                }
+
                 endTile = tilePose;
                 
                 
@@ -230,43 +177,6 @@ public class MouseManager : MonoBehaviour
 
     private void PlaceBuilding()
     {
-       /* if (Input.GetMouseButtonDown(0))
-        {
-            RaycastHit raycastHit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out raycastHit, 100f))
-            {
-                if (raycastHit.transform != null)
-                {
-                    //Our custom method. 
-                    //Debug.Log(raycastHit.transform.gameObject.name);
-                    GridPosition hitGridPosition = raycastHit.transform.GetComponent<GridPosition>();
-                    GridPosition.TilePos tilePose = hitGridPosition.GetTilePos();
-                    startTile = tilePose;
-                    //Debug.Log(tilePose.X + "," + tilePose.Y);
-
-                    //Testing
-
-                    //Vector3 newGOSpawn = new Vector3(raycastHit.transform.position.x, raycastHit.transform.position.y + 1.5f, raycastHit.transform.position.z);
-                    //Instantiate(testGO, newGOSpawn, Quaternion.identity);
-                }
-            }
-        }
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            RaycastHit raycastHit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out raycastHit, 100f))
-            {
-                if (raycastHit.transform != null)
-                {
-                    //Our custom method. 
-                    //Debug.Log(raycastHit.transform.gameObject.name);
-                    GridPosition hitGridPosition = raycastHit.transform.GetComponent<GridPosition>();
-                    GridPosition.TilePos tilePose = hitGridPosition.GetTilePos();
-                    endTile = tilePose;*/
-                    //Debug.Log(tilePose.X + "," + tilePose.Y);
                     if(endTile.X == startTile.X ||  endTile.Y == startTile.Y)
                     {
                         return;
@@ -277,11 +187,7 @@ public class MouseManager : MonoBehaviour
                     CreateWalls(GetSelectedTiles(startTile, endTile));
 
                     houseBuildingState = HouseBuilding.None;
-                    //Vector3 newGOSpawn = new Vector3(raycastHit.transform.position.x, raycastHit.transform.position.y + 1.5f, raycastHit.transform.position.z);
-                    //Instantiate(testGO, newGOSpawn, Quaternion.identity);
-                /*}
-            }
-        }*/
+                    
 
         //Find all tiles in the array
         //Find all edge tiles
@@ -323,136 +229,17 @@ public class MouseManager : MonoBehaviour
             selectedTiles[arrayLengthX - 1, i] = gridSystem.GetTileInArray(startx + arrayLengthX - 1, starty + i);  // startx + arrayLengthX - 1 for the right
         }
 
+        
+
         return selectedTiles;
     }
 
-
-/*    private GridPosition.TilePos[,] GetSelectedTiles(GridPosition.TilePos startTile, GridPosition.TilePos endTile)
-    {
-        int arrayLengthX = Convert.ToInt32(MathF.Abs(startTile.X - endTile.X) + 1);
-        int arrayLengthZ = Convert.ToInt32(MathF.Abs(startTile.Y - endTile.Y) + 1);
-
-
-        GridPosition.TilePos[,] selectedTiles = new GridPosition.TilePos[arrayLengthX,arrayLengthZ];
-
-        
-         
-
-        
-
-        //selectedTiles[0,0] = startTile;
-        Debug.Log(arrayLengthX + "," + arrayLengthZ);
-        //selectedTiles[arrayLengthX, arrayLengthZ] = endTile;
-        int startx = Convert.ToInt32(startTile.X);
-        int starty = Convert.ToInt32(startTile.Y);
-        
-        Debug.Log(startx + "," + starty);
-
-
-
-        *//*if (startTile.X < endTile.X)
-        {
-            startx = Convert.ToInt32(startTile.X);
-        }
-        else
-        {
-            startx = Convert.ToInt32(endTile.X);
-        }
-
-        if (startTile.Y < endTile.Y)
-        {
-            starty = Convert.ToInt32(startTile.X);
-        }
-        else
-        {
-            starty = Convert.ToInt32(endTile.X);
-        }*/
-
-        /*if (startTile.X < endTile.X && startTile.Y < endTile.Y)
-        {
-            startx = Convert.ToInt32(startTile.X);
-            starty = Convert.ToInt32(startTile.Y);
-        }
-        if (startTile.X > endTile.X && startTile.Y > endTile.Y)
-        {
-            startx = Convert.ToInt32(endTile.X);
-            starty = Convert.ToInt32(endTile.Y);
-        }
-
-        if (startTile.X < endTile.X && startTile.Y > endTile.Y)
-        {
-            startx = Convert.ToInt32(startTile.X);
-            starty = Convert.ToInt32(endTile.Y);
-
-
-        }
-        if (startTile.X > endTile.X && startTile.Y < endTile.Y)
-        {
-            startx = Convert.ToInt32(endTile.X);
-            starty = Convert.ToInt32(startTile.Y);
-        }*//*
-
-        int xpos = startx;
-        int ypos = starty;
-        
-        Debug.Log(xpos + "," + ypos);
-        Debug.Log(endTile.X + "," + endTile.Y);
-
-        if (Mathf.Abs(startTile.X - endTile.X) <= 1 || Mathf.Abs(startTile.Y - endTile.Y) <= 1)
-        {
-            Debug.Log("this is smaller than a 3X3s");
-        }
-
-
-        for (int i = 0; i < arrayLengthZ; i++)
-        {
-            Debug.Log(gridSystem.GetTileInArray(xpos, ypos));
-            selectedTiles[i,0] = gridSystem.GetTileInArray(xpos, ypos);
-            selectedTiles[i, arrayLengthX - 1] = gridSystem.GetTileInArray(xpos + arrayLengthX - 1, ypos);
-            ypos++;
-
-        }
-        ypos = starty;
-        xpos++;
-        for (int i = 1; i < arrayLengthX - 1; i++)
-        {
-            
-            //Debug.Log(gridSystem.GetTileInArray(xpos, ypos).X + ","  + gridSystem.GetTileInArray(xpos, ypos).Y);
-            //Debug.Log(gridSystem.GetTileInArray(xpos, ypos).X);
-            Debug.Log(i);
-            selectedTiles[0,i] = gridSystem.GetTileInArray(xpos, ypos);
-            selectedTiles[arrayLengthZ - 1, i] = gridSystem.GetTileInArray(xpos, ypos + arrayLengthZ - 1);
-            xpos++;
-
-
-        }
-        xpos = starty;
-        
-
-        for (int i = 0; i <= arrayLengthX; i++)
-        {
-            for (int j = 0; j <= arrayLengthZ; j++)
-            {
-                //Debug.Log(selectedTiles[i, j].X + "." + selectedTiles[i, j].Y);
-
-            }
-        }
-
-
-
-        return selectedTiles;
-        
-        
-
-        
-
-
-
-    }*/
-
     private void CreateWalls(GridPosition.TilePos[,] selectedTiles)
     {
-        
+        if (preVizWallDown)
+        {
+            return;
+        }
 
         preVizWall = new List<GameObject>();
         
@@ -472,19 +259,23 @@ public class MouseManager : MonoBehaviour
         
 
 
-        if(preVizWallDown)
-        {
-            return;
-        }
+        
         for (int i = 0; i < arrayLengthX; i++)
         {
             for (int j = 0; j < arrayLengthZ; j++)
             {
+                if (selectedTiles[i, j].X == 0 && selectedTiles[i, j].Y == 0 && !startIsZero )
+                {
+                    Debug.Log("zero is end or start");
+                    continue; // Skip invalid tiles
+                    
+                }
                 Vector3 newGOSpawn = new Vector3(selectedTiles[i,j].Y * 1.5f, 1.5f, selectedTiles[i,j].X * 1.5f);
                 GameObject newBlock = Instantiate(testGO, newGOSpawn, Quaternion.identity);
-                Debug.Log(newBlock.transform.name);
+                
                 preVizWall.Add(newBlock);
                 preVizWallDown = true;
+                startIsZero = false;
 
             }
         }
@@ -511,8 +302,7 @@ public class MouseManager : MonoBehaviour
     private void DestroyPreVizBlocks(List<GameObject> goList)
     {
         foreach (GameObject go in goList)
-        {
-            Debug.Log(go);
+        {;
             Destroy(go);
         }
             
