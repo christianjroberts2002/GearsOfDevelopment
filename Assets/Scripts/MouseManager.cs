@@ -13,12 +13,18 @@ public class MouseManager : MonoBehaviour
     private Camera Camera;
 
     [SerializeField] List<GameObject> preVizWall;
+    [SerializeField] List<GameObject> preVizRoof;
 
     [SerializeField] GameObject preVizGO;
     [SerializeField] GameObject finalGO;
 
     [SerializeField] GameObject testGO;
+    [SerializeField] GameObject testCornerGO;
+    [SerializeField] GameObject roofGO;
+    [SerializeField] GameObject roofCornerGO;
     [SerializeField] GridSystem gridSystem;
+
+    private GridPosition.TilePos[,] roofTiles;
     /*    [SerializeField] GridPosition.TilePos startTile;
         [SerializeField] GridPosition.TilePos endTile;*/
 
@@ -28,7 +34,10 @@ public class MouseManager : MonoBehaviour
     public HouseBuilding houseBuildingState;
 
     private bool preVizWallDown = false;
+    private bool preVizRoofDown = false;
     private bool startIsZero = false;
+
+    private int roofLevel;
 
 
 
@@ -66,8 +75,10 @@ public class MouseManager : MonoBehaviour
         {
             houseBuildingState = HouseBuilding.MouseUp;
             preVizWallDown = false;
+            preVizRoofDown= false;
             
             DestroyPreVizBlocks(preVizWall);
+            DestroyPreVizBlocks(preVizRoof);
         }
 
         if (houseBuildingState == HouseBuilding.MouseDown)
@@ -131,27 +142,37 @@ public class MouseManager : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out raycastHit, 1000f, layerMask))
         {
+            float lastEndX = -1;
+            float lastEndZ = -1;
+
             if (raycastHit.transform != null)
             {
                 //Our custom method. 
                 //Debug.Log(raycastHit.transform.gameObject.name);
                 GridPosition hitGridPosition = raycastHit.transform.GetComponent<GridPosition>();
                 GridPosition.TilePos tilePose = hitGridPosition.GetTilePos();
+                endTile = tilePose;
+
+                
+
+                if (lastEndX != endTile.X && lastEndZ != endTile.Y)
+                {
+                    DestroyPreVizBlocks(preVizWall);
+                    DestroyPreVizBlocks(preVizRoof);
+                    preVizWallDown = false;
+                    preVizRoofDown = false;
+                }
+
+                
+                lastEndX = endTile.X;
+                lastEndZ = endTile.Y;
 
                 if ((startTile.X == 0 && startTile.Y == 0) || (endTile.X == 0 && endTile.Y == 0))
                 {
                     startIsZero = true;
                 }
 
-                if (endTile.X != null && endTile.X != tilePose.X && endTile.Y != null && endTile.Y != tilePose.X)
-                {
-                    DestroyPreVizBlocks(preVizWall);
-                    preVizWallDown = false;
-                }
 
-                endTile = tilePose;
-                
-                
                 //Debug.Log(tilePose.X + "," + tilePose.Y);
                 if (endTile.X == startTile.X && endTile.Y == startTile.Y)
                 {
@@ -164,7 +185,33 @@ public class MouseManager : MonoBehaviour
                 }
                 //Testing
 
+                NormalizeTileBounds();
+
                 CreateWalls(GetSelectedTiles(startTile, endTile));
+                float roofHeight = 0;
+                
+
+                roofHeight = (Mathf.Min(Mathf.Abs(endTile.X - startTile.X), Mathf.Abs(endTile.Y - startTile.Y)));
+                roofHeight = Mathf.CeilToInt(roofHeight / 2);
+
+
+                startTile = new GridPosition.TilePos(startTile.X, startTile.Y);
+                endTile = new GridPosition.TilePos(endTile.X, endTile.Y);
+
+                preVizRoof = new List<GameObject>();
+                roofLevel = 0;
+                for (int i = 0; i <= roofHeight; i++)
+                {
+                    GridPosition.TilePos roofstart = new GridPosition.TilePos(startTile.X + i, startTile.Y + i);
+                    GridPosition.TilePos roofend = new GridPosition.TilePos(endTile.X - i, endTile.Y - i);
+                    preVizRoofDown = false;
+                    roofLevel++;
+                    PreVizRoof(GetSelectedTiles(roofstart, roofend));
+                }
+                preVizRoofDown = true;
+
+
+                
                 //Vector3 newGOSpawn = new Vector3(raycastHit.transform.position.x, raycastHit.transform.position.y + 1.5f, raycastHit.transform.position.z);
                 //Instantiate(testGO, newGOSpawn, Quaternion.identity);
             }
@@ -173,6 +220,17 @@ public class MouseManager : MonoBehaviour
         //Find all tiles in the array
         //Find all edge tiles
         // place GO in the edge tiles
+    }
+
+    private void NormalizeTileBounds()
+    {
+        int startX = (int)Mathf.Min(startTile.X, endTile.X);
+        int endX = (int)Mathf.Max(startTile.X, endTile.X);
+        int startY = (int)Mathf.Min(startTile.Y, endTile.Y);
+        int endY = (int)Mathf.Max(startTile.Y, endTile.Y);
+
+        startTile = new GridPosition.TilePos(startX, startY);
+        endTile = new GridPosition.TilePos(endX, endY);
     }
 
     private void PlaceBuilding()
@@ -200,6 +258,8 @@ public class MouseManager : MonoBehaviour
         int endx = Convert.ToInt32(Mathf.Max(startTile.X, endTile.X));
         int starty = Convert.ToInt32(Mathf.Min(startTile.Y, endTile.Y));
         int endy = Convert.ToInt32(Mathf.Max(startTile.Y, endTile.Y));
+
+        //Debug.Log(startx +"," + starty);
 
         int arrayLengthX = endx - startx + 1;
         int arrayLengthZ = endy - starty + 1;
@@ -241,7 +301,7 @@ public class MouseManager : MonoBehaviour
             return;
         }
 
-        preVizWall = new List<GameObject>();
+        
         
 
         if(selectedTiles == null)
@@ -249,60 +309,241 @@ public class MouseManager : MonoBehaviour
             return;
         }
 
+        preVizWall = new List<GameObject>();
+        
         int arrayLengthX = selectedTiles.GetLength(0);
         int arrayLengthZ = selectedTiles.GetLength(1);
+
+        int roofArrayX = arrayLengthX - 1;
+        int roofArrayZ = arrayLengthZ - 1;
+
+        roofTiles = new GridPosition.TilePos[roofArrayX, roofArrayZ];
+        /*if(arrayLengthX !> 2 ||  arrayLengthZ !> 2)
+        {
+            return;
+        }*/
+
+
+
+        for (int i = 0; i < arrayLengthX; i++)
+        {
+            for (int j = 0; j < arrayLengthZ; j++)
+            {
+                
+                if (selectedTiles[i, j].X == 0 && selectedTiles[i, j].Y == 0 && !startIsZero )
+                {
+                    //Debug.Log("zero is end or start");
+                    continue; // Skip invalid tiles
+                    
+                }
+                // Place corner blocks with rotation
+                if ((i == 0 && j == 0)) // Top-left corner
+                {
+                    Quaternion rotation = Quaternion.Euler(0, 180, 0); // No rotation
+                    Vector3 newGOCornerSpawn = new Vector3(selectedTiles[i, j].Y * 1.5f, 1.5f, selectedTiles[i, j].X * 1.5f);
+                    GameObject newCornerBlock = Instantiate(testCornerGO, newGOCornerSpawn, rotation);
+                    preVizWall.Add(newCornerBlock);
+                    continue;
+                }
+                else if ((i == 0 && j == arrayLengthZ - 1)) // Top-right corner
+                {
+                    Quaternion rotation = Quaternion.Euler(0, 90, 0); // Rotate 90 degrees around Y-axis
+                    Vector3 newGOCornerSpawn = new Vector3(selectedTiles[i, j].Y * 1.5f, 1.5f, selectedTiles[i, j].X * 1.5f);
+                    GameObject newCornerBlock = Instantiate(testCornerGO, newGOCornerSpawn, rotation);
+                    preVizWall.Add(newCornerBlock);
+                    continue;
+                }
+                else if ((i == arrayLengthX - 1 && j == 0)) // Bottom-left corner
+                {
+                    Quaternion rotation = Quaternion.Euler(0, -90, 0); // Rotate -90 degrees around Y-axis
+                    Vector3 newGOCornerSpawn = new Vector3(selectedTiles[i, j].Y * 1.5f, 1.5f, selectedTiles[i, j].X * 1.5f);
+                    GameObject newCornerBlock = Instantiate(testCornerGO, newGOCornerSpawn, rotation);
+                    preVizWall.Add(newCornerBlock);
+                    continue;
+                }
+                else if ((i == arrayLengthX - 1 && j == arrayLengthZ - 1)) // Bottom-right corner
+                {
+                    Quaternion rotation = Quaternion.Euler(0, 0, 0); // Rotate 180 degrees around Y-axis
+                    Vector3 newGOCornerSpawn = new Vector3(selectedTiles[i, j].Y * 1.5f, 1.5f, selectedTiles[i, j].X * 1.5f);
+                    GameObject newCornerBlock = Instantiate(testCornerGO, newGOCornerSpawn, rotation);
+                    preVizWall.Add(newCornerBlock);
+                    continue;
+                }
+                if(i == arrayLengthX -1 || i + arrayLengthZ -1 == arrayLengthZ - 1)
+                {
+                    float tileOffsetX = -.5f;
+                    if(i == arrayLengthX -1)
+                    {
+                        tileOffsetX = .5f;
+                    }
+
+                    Quaternion rotation = Quaternion.Euler(0, 90, 0); // Rotate 180 degrees around Y-axis
+                    Vector3 newGOSpawn = new Vector3(selectedTiles[i, j].Y * 1.5f, 1.5f, (selectedTiles[i, j].X * 1.5f) + tileOffsetX);
+                    GameObject newblock = Instantiate(testGO, newGOSpawn, rotation);
+                    preVizWall.Add(newblock);
+                    preVizWallDown = true;
+                    startIsZero = false;
+                    continue;
+                }
+                else if (j == arrayLengthZ - 1 || j + arrayLengthX - 1 == arrayLengthX - 1)
+                {
+                    float tileOffsetY = -.5f;
+                    if (j == arrayLengthZ - 1)
+                    {
+                        tileOffsetY = .5f;
+                    }
+                    Quaternion rotation = Quaternion.Euler(0,0, 0); // Rotate 180 degrees around Y-axis
+                    Vector3 newGOSpawn = new Vector3((selectedTiles[i, j].Y * 1.5f) +tileOffsetY, 1.5f, selectedTiles[i, j].X * 1.5f);
+                    GameObject newblock = Instantiate(testGO, newGOSpawn, rotation);
+                    preVizWall.Add(newblock);
+                    preVizWallDown = true;
+                    startIsZero = false;
+                    continue;
+                }
+
+                /*for (i = 0  ; i < arrayLengthX - 2; i++)
+                {
+                    for(j = 0  ; j < arrayLengthZ - 2; j++)
+                    {
+                        roofTiles[i,j] = selectedTiles[i,j];
+                    }
+                }*/
+                
+
+            }
+        }
+        //PreVizRoof(roofTiles);
+
+    }
+
+    private void PreVizRoof(GridPosition.TilePos[,] selectedTiles)
+    {
+        if (preVizRoofDown)
+        {
+            return;
+        }
+
+
+
+
+        if (selectedTiles == null)
+        {
+            Debug.Log("Reutrn lisst is null");
+            return;
+        }
+
+        
+
+        int arrayLengthX = selectedTiles.GetLength(0);
+        int arrayLengthZ = selectedTiles.GetLength(1);
+
+        int roofArrayX = arrayLengthX - 1;
+        int roofArrayZ = arrayLengthZ - 1;
+
 
         /*if(arrayLengthX !> 2 ||  arrayLengthZ !> 2)
         {
             return;
         }*/
-        
+
+        float roofIntialOffset = 1.5f;
+        float roofHeight = 1.5f;
 
 
-        
         for (int i = 0; i < arrayLengthX; i++)
         {
             for (int j = 0; j < arrayLengthZ; j++)
             {
-                if (selectedTiles[i, j].X == 0 && selectedTiles[i, j].Y == 0 && !startIsZero )
+
+                /*if (selectedTiles[i, j].X == 0 && selectedTiles[i, j].Y == 0 && !startIsZero)
                 {
-                    Debug.Log("zero is end or start");
+                    //Debug.Log("zero is end or start");
                     continue; // Skip invalid tiles
-                    
+
+                }*/
+                // Place corner blocks with rotation
+                if ((i == 0 && j == 0)) // Top-left corner
+                {
+                    Quaternion rotation = Quaternion.Euler(0, 180, 0); // No rotation
+                    Vector3 newGOCornerSpawn = new Vector3(selectedTiles[i, j].Y * 1.5f, 1.5f + (roofIntialOffset * roofLevel), selectedTiles[i, j].X * 1.5f);
+                    GameObject newCornerBlock = Instantiate(roofCornerGO, newGOCornerSpawn, rotation);
+                    preVizRoof.Add(newCornerBlock);
+                    continue;
                 }
-                Vector3 newGOSpawn = new Vector3(selectedTiles[i,j].Y * 1.5f, 1.5f, selectedTiles[i,j].X * 1.5f);
-                GameObject newBlock = Instantiate(testGO, newGOSpawn, Quaternion.identity);
-                
-                preVizWall.Add(newBlock);
-                preVizWallDown = true;
-                startIsZero = false;
+                else if ((i == 0 && j == arrayLengthZ - 1)) // Top-right corner
+                {
+                    Quaternion rotation = Quaternion.Euler(0, 90, 0); // Rotate 90 degrees around Y-axis
+                    Vector3 newGOCornerSpawn = new Vector3(selectedTiles[i, j].Y * 1.5f, 1.5f + (roofIntialOffset * roofLevel), selectedTiles[i, j].X * 1.5f);
+                    GameObject newCornerBlock = Instantiate(roofCornerGO, newGOCornerSpawn, rotation);
+                    preVizRoof.Add(newCornerBlock);
+                    continue;
+                }
+                else if ((i == arrayLengthX - 1 && j == 0)) // Bottom-left corner
+                {
+                    Quaternion rotation = Quaternion.Euler(0, -90, 0); // Rotate -90 degrees around Y-axis
+                    Vector3 newGOCornerSpawn = new Vector3(selectedTiles[i, j].Y * 1.5f, 1.5f + (roofIntialOffset * roofLevel), selectedTiles[i, j].X * 1.5f);
+                    GameObject newCornerBlock = Instantiate(roofCornerGO, newGOCornerSpawn, rotation);
+                    preVizRoof.Add(newCornerBlock);
+                    continue;
+                }
+                else if ((i == arrayLengthX - 1 && j == arrayLengthZ - 1)) // Bottom-right corner
+                {
+                    Quaternion rotation = Quaternion.Euler(0, 0, 0); // Rotate 180 degrees around Y-axis
+                    Vector3 newGOCornerSpawn = new Vector3(selectedTiles[i, j].Y * 1.5f, 1.5f + (roofIntialOffset * roofLevel), selectedTiles[i, j].X * 1.5f);
+                    GameObject newCornerBlock = Instantiate(roofCornerGO, newGOCornerSpawn, rotation);
+                    preVizRoof.Add(newCornerBlock);
+                    continue;
+                }
+                if (i == arrayLengthX - 1 || i + arrayLengthZ - 1 == arrayLengthZ - 1)
+                {
+                    float tileOffsetX = -.0f;
+                    if (i == arrayLengthX - 1)
+                    {
+                        tileOffsetX = .0f;
+                    }
+
+                    Quaternion rotation = Quaternion.Euler(0, 90, 0); // Rotate 180 degrees around Y-axis
+                    Vector3 newGOSpawn = new Vector3(selectedTiles[i, j].Y * 1.5f, 1.5f + (roofIntialOffset * roofLevel), (selectedTiles[i, j].X * 1.5f) + tileOffsetX);
+                    GameObject newblock = Instantiate(roofGO, newGOSpawn, rotation);
+                    preVizRoof.Add(newblock);
+                    //preVizRoofDown = true;
+                    startIsZero = false;
+                    continue;
+                }
+                else if (j == arrayLengthZ - 1 || j + arrayLengthX - 1 == arrayLengthX - 1)
+                {
+                    float tileOffsetY = -.0f;
+                    if (j == arrayLengthZ - 1)
+                    {
+                        tileOffsetY = .0f;
+                    }
+                    Quaternion rotation = Quaternion.Euler(0, 0, 0); // Rotate 180 degrees around Y-axis
+                    Vector3 newGOSpawn = new Vector3((selectedTiles[i, j].Y * 1.5f) + tileOffsetY, 1.5f + (roofIntialOffset * roofLevel), selectedTiles[i, j].X * 1.5f);
+                    GameObject newblock = Instantiate(roofGO, newGOSpawn, rotation);
+                    preVizRoof.Add(newblock);
+                    //preVizRoofDown = true;
+                    startIsZero = false;
+                    continue;
+                }
+
+                /*for (i = 0  ; i < arrayLengthX - 2; i++)
+                {
+                    for(j = 0  ; j < arrayLengthZ - 2; j++)
+                    {
+                        roofTiles[i,j] = selectedTiles[i,j];
+                    }
+                }*/
+
 
             }
         }
-    }
-
-    private void CreateRoof(GridPosition.TilePos[,] selectedTiles)
-    {
-        int arrayLengthX = selectedTiles.GetLength(0) - 1;
-        int arrayLengthZ = selectedTiles.GetLength(1) - 1;
-
-
-
-        for (int i = 0; i <= arrayLengthX; i++)
-        {
-            for (int j = 0; j <= arrayLengthZ; j++)
-            {
-                Vector3 newGOSpawn = new Vector3(selectedTiles[i, j].X * 1.5f, 1.5f, selectedTiles[i, j].Y * 1.5f);
-                Instantiate(testGO, newGOSpawn, Quaternion.identity);
-
-            }
-        }
+        //PreVizRoof(roofTiles);
     }
 
     private void DestroyPreVizBlocks(List<GameObject> goList)
     {
         foreach (GameObject go in goList)
-        {;
+        {
             Destroy(go);
         }
             

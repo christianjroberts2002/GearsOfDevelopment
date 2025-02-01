@@ -148,7 +148,7 @@ Light:
   serializedVersion: 11
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 130000
+  m_Intensity: 66854.836
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -210,13 +210,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 157207112}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.8871124, y: -0, z: -0, w: 0.46155348}
+  m_LocalRotation: {x: 0.60953003, y: -0, z: -0, w: 0.79276305}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 125.024994, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 75.111, y: 0, z: 0}
 --- !u!114 &157207115
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -795,6 +795,9 @@ MonoBehaviour:
   preVizGO: {fileID: 3756415556380609043, guid: e009897885af9cf4f8d761a8bd36f782, type: 3}
   finalGO: {fileID: 3756415556380609043, guid: f4f1961d065e91642a8346452bb3b258, type: 3}
   testGO: {fileID: 3756415556380609043, guid: f4f1961d065e91642a8346452bb3b258, type: 3}
+  testCornerGO: {fileID: 3756415556380609043, guid: 268cee6fb7bab2549a42873808779c59, type: 3}
+  roofGO: {fileID: 3756415556380609043, guid: 5787302a96dfb3d49a6b39d5181fb2eb, type: 3}
+  roofCornerGO: {fileID: 3756415556380609043, guid: 6a27e3b60cab4034bbd56753384af771, type: 3}
   gridSystem: {fileID: 0}
   houseBuildingState: 0
 --- !u!1 &2013410473

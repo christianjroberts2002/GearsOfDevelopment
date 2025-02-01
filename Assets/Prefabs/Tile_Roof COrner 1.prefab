@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3882310206067289453}
   - component: {fileID: 5137556883087583945}
   m_Layer: 6
-  m_Name: Tile_Prefab Opaque
+  m_Name: Tile_Roof COrner 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29,8 +29,8 @@ Transform:
   m_GameObject: {fileID: 3756415556380609043}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.2, y: 0, z: 0}
-  m_LocalScale: {x: 0.48446998, y: 1.5, z: 1.5}
+  m_LocalPosition: {x: 0.00000024508788, y: 0, z: 0.029999897}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 03a72bee033e05947a05dfc5988c8546, type: 2}
+  - {fileID: 2100000, guid: 225d9052c21bcf44ebdfd3bc4ef40319, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
