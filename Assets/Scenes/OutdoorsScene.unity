@@ -564,7 +564,7 @@ Transform:
   m_GameObject: {fileID: 1823688464}
   serializedVersion: 2
   m_LocalRotation: {x: 0.26216775, y: -0, z: -0, w: 0.9650223}
-  m_LocalPosition: {x: 2.47, y: 9.67, z: 0.03}
+  m_LocalPosition: {x: 21.74, y: 9.67, z: 25.06}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -757,9 +757,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileSize: 1.5
-  gridXSize: 10
-  gridYSize: 10
-  gridZSize: 10
+  gridXSize: 100
+  gridYSize: 100
+  gridZSize: 100
   gridTileVisual: {fileID: 3756415556380609043, guid: fde9eb5c9f17d9347b3b08325c0ed190, type: 3}
 --- !u!4 &1924699272
 Transform:
@@ -792,6 +792,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 183
   preVizWall: []
+  preVizRoof: []
   preVizGO: {fileID: 3756415556380609043, guid: e009897885af9cf4f8d761a8bd36f782, type: 3}
   finalGO: {fileID: 3756415556380609043, guid: f4f1961d065e91642a8346452bb3b258, type: 3}
   testGO: {fileID: 3756415556380609043, guid: f4f1961d065e91642a8346452bb3b258, type: 3}

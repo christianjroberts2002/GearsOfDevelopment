@@ -31,6 +31,9 @@ public class MouseManager : MonoBehaviour
     GridPosition.TilePos startTile;
     GridPosition.TilePos endTile;
 
+    GridPosition.TilePos oStartTile;
+    GridPosition.TilePos oEndTile;
+
     public HouseBuilding houseBuildingState;
 
     private bool preVizWallDown = false;
@@ -153,6 +156,9 @@ public class MouseManager : MonoBehaviour
                 GridPosition.TilePos tilePose = hitGridPosition.GetTilePos();
                 endTile = tilePose;
 
+                oStartTile = startTile;
+                oEndTile = endTile;
+
                 
 
                 if (lastEndX != endTile.X && lastEndZ != endTile.Y)
@@ -185,7 +191,7 @@ public class MouseManager : MonoBehaviour
                 }
                 //Testing
 
-                NormalizeTileBounds();
+                //NormalizeTileBounds();
 
                 CreateWalls(GetSelectedTiles(startTile, endTile));
                 float roofHeight = 0;
@@ -194,18 +200,20 @@ public class MouseManager : MonoBehaviour
                 roofHeight = (Mathf.Min(Mathf.Abs(endTile.X - startTile.X), Mathf.Abs(endTile.Y - startTile.Y)));
                 roofHeight = Mathf.CeilToInt(roofHeight / 2);
 
-
-                startTile = new GridPosition.TilePos(startTile.X, startTile.Y);
-                endTile = new GridPosition.TilePos(endTile.X, endTile.Y);
+                int startx = Convert.ToInt32(Mathf.Min(startTile.X, endTile.X));
+                int endx = Convert.ToInt32(Mathf.Max(startTile.X, endTile.X));
+                int starty = Convert.ToInt32(Mathf.Min(startTile.Y, endTile.Y));
+                int endy = Convert.ToInt32(Mathf.Max(startTile.Y, endTile.Y));
 
                 preVizRoof = new List<GameObject>();
                 roofLevel = 0;
                 for (int i = 0; i <= roofHeight; i++)
                 {
-                    GridPosition.TilePos roofstart = new GridPosition.TilePos(startTile.X + i, startTile.Y + i);
-                    GridPosition.TilePos roofend = new GridPosition.TilePos(endTile.X - i, endTile.Y - i);
+                    GridPosition.TilePos roofstart = new GridPosition.TilePos(startx + i, starty + i);
+                    GridPosition.TilePos roofend = new GridPosition.TilePos(endx - i, endy - i);
                     preVizRoofDown = false;
                     roofLevel++;
+                    
                     PreVizRoof(GetSelectedTiles(roofstart, roofend));
                 }
                 preVizRoofDown = true;
@@ -258,6 +266,8 @@ public class MouseManager : MonoBehaviour
         int endx = Convert.ToInt32(Mathf.Max(startTile.X, endTile.X));
         int starty = Convert.ToInt32(Mathf.Min(startTile.Y, endTile.Y));
         int endy = Convert.ToInt32(Mathf.Max(startTile.Y, endTile.Y));
+        
+        
 
         //Debug.Log(startx +"," + starty);
 
