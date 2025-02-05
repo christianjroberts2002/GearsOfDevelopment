@@ -121,12 +121,12 @@ public class MouseManager : MonoBehaviour
             {
                 GridPosition hitGridPosition = raycastHit.transform.GetComponent<GridPosition>();
                 GridPosition.TilePos tilePose = hitGridPosition.GetTilePos();
-                if(tilePose.IsOccupied == true)
+                if (tilePose.IsOccupied == true)
                 {
                     return;
                 }
                 startTile = tilePose;
-                Debug.Log(tilePose.X + "," + tilePose.Z);
+                Debug.Log(tilePose.X + "," + tilePose.Y + "," + tilePose.Z);
                 
 
                 houseBuildingState = HouseBuilding.MouseDragged;
@@ -134,31 +134,6 @@ public class MouseManager : MonoBehaviour
         }
     }
 
-    private void ClickSetEndTile(GridPosition.TilePos endTile)
-    {
-        RaycastHit raycastHit;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out raycastHit, 100f))
-        {
-            if (raycastHit.transform != null)
-            {
-                GridPosition hitGridPosition = raycastHit.transform.GetComponent<GridPosition>();
-                GridPosition.TilePos tilePose = hitGridPosition.GetTilePos();
-                endTile = tilePose;
-                if (endTile.X == startTile.X || endTile.Z == startTile.Z)
-                {
-                    return;
-                }
-
-                //Testing
-                GetSelectedTiles(startTile, endTile);
-                CreateWalls(GetSelectedTiles(startTile, endTile));
-
-            }
-        }
-
-
-    }
 
     private void PreVizBuilding()
     {
@@ -213,7 +188,7 @@ public class MouseManager : MonoBehaviour
                     return;
                 }
 
-                if (Mathf.Abs(endTile.X - startTile.X) <= 1 || Mathf.Abs(endTile.Z - startTile.Z) <=1 || Mathf.Abs(endTile.Y - startTile.Y) <= 1)
+                if (Mathf.Abs(endTile.X - startTile.X) <= 1 || Mathf.Abs(endTile.Z - startTile.Z) <=1)
                 {
                     return;
                 }
@@ -257,44 +232,17 @@ public class MouseManager : MonoBehaviour
         // place GO in the edge tiles
     }
 
-    private void NormalizeTileBounds()
-    {
-        int startX = (int)Mathf.Min(startTile.X, endTile.X);
-        int endX = (int)Mathf.Max(startTile.X, endTile.X);
-        int startY = (int)Mathf.Min(startTile.Z, endTile.Z);
-        int endY = (int)Mathf.Max(startTile.Z, endTile.Z);
 
-        startTile = new GridPosition.TilePos(startX, 0, startY);
-        endTile = new GridPosition.TilePos(endX, 0, endY);
-    }
-
-    private void PlaceBuilding()
-    {
-                    if(endTile.X == startTile.X ||  endTile.Z == startTile.Z)
-                    {
-                        return;
-                    }
-
-                    //Testing
-                    GetSelectedTiles(startTile, endTile);
-                    CreateWalls(GetSelectedTiles(startTile, endTile));
-
-                    houseBuildingState = HouseBuilding.None;
-                    
-
-        //Find all tiles in the array
-        //Find all edge tiles
-        // place GO in the edge tiles
-    }
 
     private GridPosition.TilePos[,,] GetSelectedTiles(GridPosition.TilePos startTile, GridPosition.TilePos endTile)
     {
         int startx = Convert.ToInt32(Mathf.Min(startTile.X, endTile.X));
         int endx = Convert.ToInt32(Mathf.Max(startTile.X, endTile.X));
-        int starty = Convert.ToInt32(Mathf.Max(startTile.Y, endTile.Y));
+        int starty = Convert.ToInt32(Mathf.Min(startTile.Y, endTile.Y));
+        int endy = Convert.ToInt32(Mathf.Max(startTile.Y, endTile.Y));
         int startz = Convert.ToInt32(Mathf.Min(startTile.Z, endTile.Z));
         int endz = Convert.ToInt32(Mathf.Max(startTile.Z, endTile.Z));
-        int endy = Convert.ToInt32(Mathf.Max(startTile.Y, endTile.Y));
+
 
 
 
@@ -323,8 +271,9 @@ public class MouseManager : MonoBehaviour
             {
                 // Top edge: (i, 0)
                 selectedTiles[i, y, 0] = gridSystem.GetTileInArray(startx + i, starty + y, startz);  // starty is constant for top
-                                                                                            // Bottom edge: (i, arrayLengthZ - 1)
+                                                                                        // Bottom edge: (i, arrayLengthZ - 1)
                 selectedTiles[i, y, arrayLengthZ - 1] = gridSystem.GetTileInArray(startx + i, starty + y, startz + arrayLengthZ - 1); // starty + arrayLengthZ - 1 for the bottom
+                
             }
             
         }
@@ -342,10 +291,25 @@ public class MouseManager : MonoBehaviour
 
         }
 
+        for (int x = 0; x < arrayLengthX; x++) // Avoid duplicate corners
+        {
+            // Left and Right Edges (X stays constant)
+            for (int y = 0; y < arrayLengthY; y++) // Avoid duplicate corners
+            {
+                for (int z = 0; z < arrayLengthZ; z++) // Avoid duplicate corners
+                {
+                    selectedTiles[x, y, z].IsOccupied = true;
+                }
+            }
+
+        }
 
 
 
-            return selectedTiles;
+
+
+
+        return selectedTiles;
     }
 
     private void CreateWalls(GridPosition.TilePos[,,] selectedTiles)

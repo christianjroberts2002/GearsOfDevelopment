@@ -31,40 +31,40 @@ public class GridSystem : MonoBehaviour
 
     void CreateGrid(float gridXSize, float gridYSize, float gridZSize)
     {
-        float xPos = 0;
-        float yPos = 0;
-        float zPos = 0;
+        float xPos = 0f;
+    float yPos = 0f;
+    float zPos = 0f;
 
-        for (int x = 0; x < Mathf.FloorToInt(gridXSize); x++)
+    for (int z = 0; z < Mathf.FloorToInt(gridXSize); z++)
+    {
+        for (int y = 0; y < Mathf.FloorToInt(gridYSize); y++)
         {
-            for (int y = 0; y < Mathf.FloorToInt(gridYSize); y++)
+            for (int x = 0; x < Mathf.FloorToInt(gridZSize); x++)
             {
-                for (int z = 0; z < Mathf.FloorToInt(gridZSize); z++)
-                {
-                    // Store the grid cell data.
-                    StoreGridArray(z, y, x);
+                // Store the grid cell data using the correct order.
+                StoreGridArray(x, y, z);
 
-                    // Calculate the position of the tile.
-                    Vector3 newTilePos = new Vector3(xPos, yPos, zPos);
+                // Calculate the position of the tile.
+                Vector3 newTilePos = new Vector3(xPos, yPos, zPos);
 
-                    // Optionally instantiate a visual tile.
-                    GameObject newTileGO = Instantiate(gridTileVisual, newTilePos, Quaternion.identity);
-                    TextMeshPro newTileText = newTileGO.GetComponentInChildren<TextMeshPro>();
-                    newTileText.text = x.ToString() + "," + y.ToString() + "," + z.ToString();
+                // Optionally instantiate a visual tile.
+                GameObject newTileGO = Instantiate(gridTileVisual, newTilePos, Quaternion.identity);
+                TextMeshPro newTileText = newTileGO.GetComponentInChildren<TextMeshPro>();
+                newTileText.text = x.ToString() + "," + y.ToString() + "," + z.ToString();
 
-                    // Move along the z-axis.
-                    zPos += tileSize;
-                }
-
-                // Reset z position and move along the y-axis.
-                zPos = 0;
-                yPos += tileSize;
+                // Move along the z-axis.
+                zPos += tileSize;
             }
 
-            // Reset y position and move along the x-axis.
-            yPos = 0;
-            xPos += tileSize;
+            // Reset z position and move along the y-axis.
+            zPos = 0f;
+            yPos += tileSize;
         }
+
+        // Reset y position and move along the x-axis.
+        yPos = 0f;
+        xPos += tileSize;
+    }
     }
 
 
