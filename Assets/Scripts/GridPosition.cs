@@ -12,13 +12,26 @@ public class GridPosition : MonoBehaviour
 
         public float Y;
 
-        public TilePos(float x, float y)
+        public float Z;
+
+        public bool IsOccupied;
+
+        public int BlockID;
+
+        public TilePos(float x, float y, float z,
+            bool isOccupied = false , int blockID = 0)
 
         {
 
             X = x;
 
             Y = y;
+
+            Z = z;
+
+            IsOccupied = isOccupied;
+
+            BlockID = blockID;
 
         }
 
@@ -27,7 +40,7 @@ public class GridPosition : MonoBehaviour
 
     private void Awake()
     {
-        tilePos = new TilePos(this.gameObject.transform.position.z / 1.5f, this.gameObject.transform.position.x / 1.5f);
+        tilePos = new TilePos(this.gameObject.transform.position.z / 1.5f, this.gameObject.transform.position.y / 1.5f, this.gameObject.transform.position.x / 1.5f);
     }
 
     public TilePos GetTilePos()

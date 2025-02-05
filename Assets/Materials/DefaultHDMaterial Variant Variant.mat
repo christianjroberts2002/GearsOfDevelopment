@@ -29,7 +29,9 @@ Material:
   m_ModifiedSerializedProperties: 8
   m_ValidKeywords:
   - _DISABLE_SSR_TRANSPARENT
+  - _ENABLE_FOG_ON_TRANSPARENT
   - _NORMALMAP_TANGENT_SPACE
+  - _SURFACE_TYPE_TRANSPARENT
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -37,6 +39,7 @@ Material:
   m_CustomRenderQueue: 2225
   stringTagMap:
     MotionVector: User
+    RenderType: Transparent
   disabledShaderPasses:
   - ForwardEmissiveForDeferred
   - TransparentBackfaceDebugDisplay
@@ -51,20 +54,20 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _AlphaDstBlend: 0
+    - _AlphaDstBlend: 10
     - _CullMode: 2
     - _CullModeForward: 2
-    - _DstBlend: 0
-    - _DstBlend2: 0
+    - _DstBlend: 10
+    - _DstBlend2: 10
     - _EmissiveExposureWeight: 0
     - _Metallic: 0
-    - _StencilRefDepth: 8
-    - _StencilRefGBuffer: 10
-    - _StencilRefMV: 40
-    - _SurfaceType: 0
+    - _StencilRefDepth: 0
+    - _StencilRefGBuffer: 2
+    - _StencilRefMV: 32
+    - _SurfaceType: 1
     - _UseEmissiveIntensity: 0
-    - _ZTestDepthEqualForOpaque: 3
-    - _ZWrite: 1
+    - _ZTestDepthEqualForOpaque: 4
+    - _ZWrite: 0
     m_Colors:
     - _BaseColor: {r: 0.21698111, g: 0.08353773, b: 0.05424528, a: 0.23921569}
     - _Color: {r: 0.21698105, g: 0.083537705, b: 0.054245256, a: 0.23921569}

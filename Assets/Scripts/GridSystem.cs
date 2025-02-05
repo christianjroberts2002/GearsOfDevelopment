@@ -9,12 +9,14 @@ public class GridSystem : MonoBehaviour
     [SerializeField] private int gridYSize;
     [SerializeField] private int gridZSize;
     [SerializeField] GameObject gridTileVisual;
-    public GridPosition.TilePos[,] gameGridArray;
+    public GridPosition.TilePos[,,] gameGridArray;
+    public GridPosition.TilePos[,,] usedGameGridArray;
 
 
     private void Start()
     {
-        gameGridArray = new GridPosition.TilePos[gridXSize + 1, gridZSize + 1];
+        gameGridArray = new GridPosition.TilePos[gridXSize, gridYSize , gridZSize];
+        usedGameGridArray = new GridPosition.TilePos[gridXSize, gridYSize, gridZSize];
         CreateGrid(gridXSize, gridYSize, gridZSize);
 
         /*for (int i = 0; i <= gridXSize; i++)
@@ -30,29 +32,41 @@ public class GridSystem : MonoBehaviour
     void CreateGrid(float gridXSize, float gridYSize, float gridZSize)
     {
         float xPos = 0;
-        //float yPos = 0;
+        float yPos = 0;
         float zPos = 0;
-        
-        for (int i = 0; i <= gridXSize; i++)
+
+        for (int x = 0; x < Mathf.FloorToInt(gridXSize); x++)
         {
-            
+            for (int y = 0; y < Mathf.FloorToInt(gridYSize); y++)
+            {
+                for (int z = 0; z < Mathf.FloorToInt(gridZSize); z++)
+                {
+                    // Store the grid cell data.
+                    StoreGridArray(z, y, x);
 
-            for (int j = 0; j <= gridZSize; j++)
-            {  
-                Vector3 newTilePos = new Vector3(xPos, 0, zPos);
-                GameObject newTileGO = Instantiate(gridTileVisual, newTilePos, Quaternion.identity);
-                TextMeshPro newTileText = newTileGO.GetComponentInChildren<TextMeshPro>();
-                newTileText.text = i.ToString() + "," + j.ToString();
-                xPos = xPos + tileSize;
+                    // Calculate the position of the tile.
+                    Vector3 newTilePos = new Vector3(xPos, yPos, zPos);
 
-                StoreGridArray(i, j);
+                    // Optionally instantiate a visual tile.
+                    GameObject newTileGO = Instantiate(gridTileVisual, newTilePos, Quaternion.identity);
+                    TextMeshPro newTileText = newTileGO.GetComponentInChildren<TextMeshPro>();
+                    newTileText.text = x.ToString() + "," + y.ToString() + "," + z.ToString();
 
+                    // Move along the z-axis.
+                    zPos += tileSize;
+                }
+
+                // Reset z position and move along the y-axis.
+                zPos = 0;
+                yPos += tileSize;
             }
-            zPos = zPos + tileSize;
-            xPos = 0;
 
+            // Reset y position and move along the x-axis.
+            yPos = 0;
+            xPos += tileSize;
         }
     }
+
 
 
     public float GetTileSize()
@@ -60,14 +74,20 @@ public class GridSystem : MonoBehaviour
         return tileSize;
     }
 
-    private void StoreGridArray(int xGridPos, int zGridPos)
+    private void StoreGridArray(int xGridPos, int yGridPos, int zGridPos)
     {
-        gameGridArray[xGridPos,zGridPos] =  new GridPosition.TilePos(xGridPos, zGridPos);
+        gameGridArray[xGridPos, yGridPos, zGridPos] =  new GridPosition.TilePos(xGridPos, yGridPos,  zGridPos);
     }
 
-    public GridPosition.TilePos GetTileInArray(int xGridPos, int zGridPos)
+    public GridPosition.TilePos GetTileInArray(int xGridPos, int yGridPos, int zGridPos)
     {
-        return gameGridArray[xGridPos,zGridPos];
+        return gameGridArray[xGridPos, yGridPos ,zGridPos];
+    }
+
+    public void StoreUsedTiles(int xGridPos, int yGridPos, int zGridPos, GridPosition.TilePos tilePos)
+    {
+        usedGameGridArray[xGridPos,yGridPos,zGridPos] = tilePos;
+        tilePos.IsOccupied = true;
     }
 
     

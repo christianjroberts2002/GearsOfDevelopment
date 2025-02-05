@@ -10,10 +10,12 @@ Material:
   m_Name: DefaultHDMaterial Variant
   m_Shader: {fileID: 4800000, guid: 6e4ae4064600d784cac1e41a9e6f2e59, type: 3}
   m_Parent: {fileID: 2100000, guid: 1aeb59e2b25115542bd214dc146bdcd6, type: 2}
-  m_ModifiedSerializedProperties: 24
+  m_ModifiedSerializedProperties: 8
   m_ValidKeywords:
   - _DISABLE_SSR_TRANSPARENT
+  - _ENABLE_FOG_ON_TRANSPARENT
   - _NORMALMAP_TANGENT_SPACE
+  - _SURFACE_TYPE_TRANSPARENT
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -21,6 +23,7 @@ Material:
   m_CustomRenderQueue: 2225
   stringTagMap:
     MotionVector: User
+    RenderType: Transparent
   disabledShaderPasses:
   - ForwardEmissiveForDeferred
   - TransparentBackfaceDebugDisplay
@@ -29,26 +32,27 @@ Material:
   - TransparentDepthPostpass
   - TransparentBackface
   - RayTracingPrepass
-  m_LockedProperties: 
+  m_LockedProperties: _EnableGeometricSpecularAA
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _AlphaDstBlend: 0
+    - _AlphaDstBlend: 10
     - _CullMode: 2
     - _CullModeForward: 2
-    - _DstBlend: 0
-    - _DstBlend2: 0
-    - _StencilRefDepth: 8
-    - _StencilRefGBuffer: 10
-    - _StencilRefMV: 40
-    - _SurfaceType: 0
-    - _ZTestDepthEqualForOpaque: 3
-    - _ZWrite: 1
+    - _DstBlend: 10
+    - _DstBlend2: 10
+    - _EmissiveExposureWeight: 0
+    - _StencilRefDepth: 0
+    - _StencilRefGBuffer: 2
+    - _StencilRefMV: 32
+    - _SurfaceType: 1
+    - _ZTestDepthEqualForOpaque: 4
+    - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.28568888, g: 0.3586965, b: 0.5660378, a: 0.23921569}
-    - _Color: {r: 0.28568885, g: 0.35869646, b: 0.5660378, a: 0.23921569}
+    - _BaseColor: {r: 0.28568885, g: 0.35869646, b: 0.5660378, a: 1}
+    - _Color: {r: 0.28568882, g: 0.35869643, b: 0.5660378, a: 1}
     - _DoubleSidedConstants: {r: -1, g: -1, b: -1, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
